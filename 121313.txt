@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nova Mail Reply Clicker 95</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+
+    body {
+      font-family: Tahoma, "MS Sans Serif", Arial, sans-serif;
+      font-size: 11px;
+      background: teal;
+      color: #000;
+      overflow: hidden;
+    }
+
+    button,
+    textarea {
+      font-family: Tahoma, "MS Sans Serif", Arial, sans-serif;
+      font-size: 11px;
+      font-weight: 400;
+      font-style: normal;
+      letter-spacing: 0;
+    }
+
+    .desktop {
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(180deg, #0d7f7f 0%, #0b6f6f 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hidden { display: none !important; }
+
+    .app-window,
+    .reply-window,
+    .popup-window,
+    .loading-window {
+      background: #c0c0c0;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+      box-shadow: 1px 1px 0 #000;
+    }
+
+    .app-window {
+      width: 1120px;
+      height: 720px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .reply-window {
+      position: fixed;
+      width: 760px;
+      height: 590px;
+      top: 53%;
+      left: 56%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      z-index: 30;
+    }
+
+    .popup-window {
+      position: fixed;
+      width: 340px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .loading-window {
+      position: fixed;
+      width: 360px;
+      top: 54%;
+      left: 54%;
+      transform: translate(-50%, -50%);
+      z-index: 90;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .title-bar {
+      height: 28px;
+      background: linear-gradient(90deg, #000080, #1084d0);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px 0 6px;
+      font-weight: bold;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .title-buttons {
+      display: flex;
+      gap: 2px;
+    }
+
+    .title-buttons button,
+    .action-btn,
+    .buy-btn,
+    .reply-actions button,
+    .popup-actions button,
+    .menu-action-btn {
+      background: #c0c0c0;
+      color: #000;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+      cursor: pointer;
+    }
+
+    .title-buttons button {
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      min-width: 18px;
+    }
+
+    .action-btn,
+    .buy-btn,
+    .reply-actions button,
+    .popup-actions button,
+    .menu-action-btn {
+      height: 28px;
+      min-width: 90px;
+      padding: 0 10px;
+    }
+
+    .menu-bar {
+      height: 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 0 8px;
+      border-bottom: 1px solid #808080;
+      flex-shrink: 0;
+    }
+
+    .menu-bar span {
+      cursor: default;
+      user-select: none;
+    }
+
+    .top-stats {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      gap: 8px;
+      padding: 8px;
+      border-top: 1px solid #dfdfdf;
+      border-bottom: 2px solid #808080;
+      flex-shrink: 0;
+    }
+
+    .stat-box {
+      background: #c0c0c0;
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      padding: 6px 10px;
+      min-width: 120px;
+    }
+
+    .main-layout {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    .sidebar {
+      width: 190px;
+      background: #c0c0c0;
+      border-right: 2px solid #808080;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+
+    .nav-item {
+      padding: 8px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      user-select: none;
+    }
+
+    .nav-item:hover {
+      border: 1px dotted #000;
+    }
+
+    .nav-item.active {
+      background: #000080;
+      color: #fff;
+    }
+
+    .panel-area {
+      flex: 1;
+      min-width: 0;
+      padding: 8px;
+      display: flex;
+    }
+
+    .panel {
+      width: 100%;
+      height: 100%;
+      background: #c0c0c0;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .panel-header {
+      padding: 8px;
+      font-weight: bold;
+      border-bottom: 2px solid #808080;
+      background: #c0c0c0;
+      flex-shrink: 0;
+    }
+
+    .mail-list,
+    .owned-list,
+    .help-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      background: #fff;
+    }
+
+    .mail-card,
+    .shop-item,
+    .owned-item,
+    .help-item {
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+      background: #c0c0c0;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .mail-subject {
+      font-weight: bold;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .mail-meta {
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .mail-body {
+      background: #fff;
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      padding: 8px;
+      margin-bottom: 8px;
+      white-space: pre-line;
+      min-height: 52px;
+    }
+
+    .mail-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mail-badge {
+      color: #000080;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .shop-grid {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      background: #fff;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(290px, 1fr));
+      gap: 10px;
+    }
+
+    .shop-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #1d52b8, #9cc2ff);
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .shop-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .shop-desc {
+      margin-bottom: 6px;
+    }
+
+    .shop-cost {
+      margin-bottom: 8px;
+      color: #000080;
+      font-weight: bold;
+    }
+
+    .status-bar {
+      height: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 8px;
+      border-top: 2px solid #dfdfdf;
+      flex-shrink: 0;
+      gap: 12px;
+    }
+
+    .reply-content {
+      flex: 1;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .reply-meta,
+    .mistake-box {
+      background: #f0f0f0;
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      padding: 8px;
+      line-height: 1.5;
+      flex-shrink: 0;
+    }
+
+    .mistake-box {
+      color: #800000;
+      min-height: 34px;
+    }
+
+    .original-mail-box,
+    .compose-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .section-mini-title {
+      font-weight: bold;
+    }
+
+    .original-mail-body {
+      height: 95px;
+      overflow-y: auto;
+      background: #fff;
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      padding: 8px;
+      white-space: pre-line;
+      flex-shrink: 0;
+    }
+
+    .compose-box {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .editor-frame {
+      position: relative;
+      flex: 1;
+      min-height: 210px;
+      background: #fff;
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      overflow: hidden;
+    }
+
+    .editor-display,
+    #replyTextarea {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      padding: 8px;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      font-family: Tahoma, "MS Sans Serif", Arial, sans-serif;
+      font-size: 11px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 16px;
+      letter-spacing: 0;
+      word-spacing: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      text-align: left;
+      tab-size: 4;
+    }
+
+    .editor-display {
+      z-index: 1;
+      pointer-events: none;
+      user-select: none;
+      overflow: hidden;
+      color: #000;
+    }
+
+    .editor-display .typed {
+      color: #000;
+    }
+
+    .editor-display .remaining {
+      color: rgba(0, 0, 0, 0.28);
+    }
+
+    #replyTextarea {
+      z-index: 2;
+      resize: none;
+      outline: none;
+      border: none;
+      background: transparent;
+      color: transparent;
+      caret-color: #000;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .reply-actions,
+    .popup-actions {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border-top: 2px solid #808080;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .popup-body {
+      padding: 16px 12px;
+      background: #c0c0c0;
+      line-height: 1.5;
+    }
+
+    .progress-box {
+      font-weight: bold;
+      color: #000080;
+    }
+
+    .small-note {
+      color: #333;
+      font-size: 10px;
+      margin-top: 6px;
+    }
+
+    .owned-item-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .panel-toolbar {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border-bottom: 2px solid #808080;
+      background: #c0c0c0;
+      flex-wrap: wrap;
+    }
+
+    .loading-body {
+      padding: 14px 12px 10px;
+      background: #c0c0c0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .loading-text {
+      line-height: 1.5;
+    }
+
+    .win-progress {
+      height: 22px;
+      background: #fff;
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      padding: 2px;
+      overflow: hidden;
+    }
+
+    .win-progress-bar {
+      height: 100%;
+      width: 0%;
+      display: flex;
+      gap: 2px;
+      transition: width 0.08s linear;
+    }
+
+    .win-progress-block {
+      width: 10px;
+      height: 100%;
+      background: #000080;
+      flex: 0 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="desktop">
+    <div class="app-window">
+      <div class="title-bar">
+        <div class="title-text">Nova Mail Reply Clicker 95</div>
+        <div class="title-buttons">
+          <button type="button">–</button>
+          <button type="button">□</button>
+          <button type="button">×</button>
+        </div>
+      </div>
+
+      <div class="menu-bar">
+        <span>File</span>
+        <span>Edit</span>
+        <span>View</span>
+        <span>Tools</span>
+        <span>Help</span>
+      </div>
+
+      <div class="top-stats">
+        <div class="stat-box">Points: <strong id="pointsDisplay">0</strong></div>
+        <div class="stat-box">Reward: <strong id="perReplyDisplay">10</strong></div>
+        <div class="stat-box">Auto Mail: <strong id="autoMailDisplay">1</strong>/6s</div>
+        <div class="stat-box">Inbox: <strong id="inboxCountDisplay">0</strong></div>
+        <div class="stat-box">Streak: <strong id="streakDisplay">0</strong></div>
+        <div class="stat-box">Auto Replies: <strong id="autoReplyDisplay">0</strong>/12s</div>
+      </div>
+
+      <div class="main-layout">
+        <div class="sidebar">
+          <div class="sidebar-title">Sections</div>
+          <div class="nav-item active" data-panel="mail">Inbox</div>
+          <div class="nav-item" data-panel="shop">Web Market</div>
+          <div class="nav-item" data-panel="upgrades">Bonuses</div>
+          <div class="nav-item" data-panel="help">Help</div>
+        </div>
+
+        <div class="panel-area">
+          <div class="panel" id="mailPanel">
+            <div class="panel-toolbar">
+              <button class="menu-action-btn" id="saveBtn" type="button">Save</button>
+              <button class="menu-action-btn" id="resetBtn" type="button">Reset Save</button>
+              <button class="menu-action-btn" id="spawnMailBtn" type="button">Get Mail</button>
+              <button class="menu-action-btn" id="autoReplyOneBtn" type="button">Auto Reply 1</button>
+            </div>
+            <div class="panel-header">Incoming E-Mails</div>
+            <div class="mail-list" id="mailList"></div>
+          </div>
+
+          <div class="panel hidden" id="shopPanel">
+            <div class="panel-header">Web Market</div>
+            <div class="shop-grid" id="shopGrid"></div>
+          </div>
+
+          <div class="panel hidden" id="upgradesPanel">
+            <div class="panel-header">Owned Bonuses</div>
+            <div class="owned-list" id="ownedList"></div>
+          </div>
+
+          <div class="panel hidden" id="helpPanel">
+            <div class="panel-header">Instructions</div>
+            <div class="help-list">
+              <div class="help-item"><strong>Typing gameplay:</strong><br />Type the exact reply shown by the gray ghost text. Only correct next letters are accepted.</div>
+              <div class="help-item"><strong>Automation:</strong><br />Auto Reply now uses a classic progress animation window before completing.</div>
+              <div class="help-item"><strong>Saving:</strong><br />The game auto-saves in your browser. You can also press the Save button manually.</div>
+              <div class="help-item"><strong>Wrong letters:</strong><br />Wrong letters are silently blocked and shown only in the reply status area.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-bar">
+        <span id="statusText">Welcome to Nova Mail Reply Clicker 95</span>
+        <span id="saveStateText">Save: ready</span>
+      </div>
+    </div>
+
+    <div class="reply-window hidden" id="replyWindow">
+      <div class="title-bar">
+        <div class="title-text" id="replyTitle">Reply</div>
+        <div class="title-buttons">
+          <button id="closeReplyBtn" type="button">×</button>
+        </div>
+      </div>
+
+      <div class="reply-content">
+        <div class="reply-meta" id="replyMeta"></div>
+
+        <div class="mistake-box" id="mistakeBox">
+          Type the exact example text to complete the letter.
+        </div>
+
+        <div class="original-mail-box">
+          <div class="section-mini-title">Original Message</div>
+          <div class="original-mail-body" id="originalMailBody"></div>
+        </div>
+
+        <div class="compose-box">
+          <div class="section-mini-title">
+            Your Reply
+            <span class="progress-box" id="progressBox"></span>
+          </div>
+          <div class="editor-frame">
+            <div class="editor-display" id="editorDisplay"></div>
+            <textarea id="replyTextarea" spellcheck="false"></textarea>
+          </div>
+          <div class="small-note" id="rewardPreview">Correct letter reward: 10 points</div>
+        </div>
+      </div>
+
+      <div class="reply-actions">
+        <button id="sendReplyBtn" type="button">Send Reply</button>
+        <button id="cancelReplyBtn" type="button">Cancel</button>
+      </div>
+    </div>
+
+    <div class="loading-window hidden" id="loadingWindow">
+      <div class="title-bar">
+        <div class="title-text">Nova Mail - Auto Reply</div>
+        <div class="title-buttons">
+          <button type="button">×</button>
+        </div>
+      </div>
+      <div class="loading-body">
+        <div class="loading-text" id="loadingText">Preparing automatic response...</div>
+        <div class="win-progress">
+          <div class="win-progress-bar" id="loadingBar"></div>
+        </div>
+        <div class="small-note" id="loadingSubtext">Please wait while the message is being answered.</div>
+      </div>
+    </div>
+
+    <div class="popup-window hidden" id="popupWindow">
+      <div class="title-bar">
+        <div class="title-text" id="popupTitle">Message</div>
+        <div class="title-buttons">
+          <button id="popupCloseBtn" type="button">×</button>
+        </div>
+      </div>
+      <div class="popup-body" id="popupMessage"></div>
+      <div class="popup-actions">
+        <button id="popupOkBtn" type="button">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SAVE_KEY = 'nova_mail_reply_clicker_95_save_v3';
+
+    const defaultState = {
+      points: 0,
+      rewardPerMail: 10,
+      autoMailRate: 1,
+      autoReplyRate: 0,
+      streak: 0,
+      bestStreak: 0,
+      activePanel: 'mail',
+      mails: [],
+      owned: [],
+      nextMailId: 1,
+      currentReplyMail: null,
+      totalCorrectLetters: 0,
+      totalAutoReplies: 0,
+      totalCompletedMails: 0,
+      keyboardHelpLevel: 0,
+      costDiscount: 0,
+      streakBonus: 0,
+      rewardMultiplier: 1
+    };
+
+    let state = structuredClone(defaultState);
+    let autoReplyBusy = false;
+    let autoReplyQueue = [];
+
+    const mailTemplates = [
+      { from: 'boss@megacorp.com', subject: 'Need that report', body: 'Please send the sales report as soon as possible.', hint: 'Hello, I will send the sales report soon. Thank you.' },
+      { from: 'client@webnet.com', subject: 'Question about pricing', body: 'Can you explain the pricing plan in more detail?', hint: 'Hello, our pricing plan depends on features and usage. I can send more details.' },
+      { from: 'news@portal.net', subject: 'Newsletter request', body: 'Would you like to subscribe to our latest updates?', hint: 'Hello, yes, I would like to subscribe to the newsletter updates. Thank you.' },
+      { from: 'support@retrosoft.com', subject: 'Ticket update', body: 'Your support ticket has been updated. Please reply.', hint: 'Hello, thank you for the update. I have reviewed the support ticket information.' },
+      { from: 'shop@classicmall.com', subject: 'Order confirmation issue', body: 'We need confirmation on your recent order. Please answer.', hint: 'Hello, I confirm the recent order. Thank you for contacting me.' },
+      { from: 'team@office.net', subject: 'Schedule confirmation', body: 'Please confirm tomorrow morning schedule.', hint: 'Hello, I confirm the schedule for tomorrow morning. Thank you.' },
+      { from: 'billing@service.com', subject: 'Invoice check', body: 'Please review the invoice and confirm receipt.', hint: 'Hello, I reviewed the invoice and confirm receipt. Thank you.' }
+    ];
+
+    const shopItems = [
+      { id: 'printer', name: 'Dot Matrix Printer', icon: '🖨', baseCost: 30, description: '+5 reward per correct mail', repeatable: true, effect() { state.rewardPerMail += 5; } },
+      { id: 'modem', name: '56k Modem', icon: '📞', baseCost: 45, description: '+1 auto mail every 6 seconds', repeatable: true, effect() { state.autoMailRate += 1; } },
+      { id: 'monitor', name: 'CRT Monitor', icon: '🖥', baseCost: 80, description: '+10 reward per correct mail', repeatable: true, effect() { state.rewardPerMail += 10; } },
+      { id: 'assistant', name: 'Office Assistant', icon: '📎', baseCost: 120, description: '+1 auto reply every 12 seconds', repeatable: true, effect() { state.autoReplyRate += 1; } },
+      { id: 'keyboard', name: 'Mechanical Keyboard', icon: '⌨', baseCost: 95, description: 'Allows 1 auto-corrected wrong key per letter', repeatable: true, effect() { state.keyboardHelpLevel += 1; } },
+      { id: 'mailroom', name: 'Mailroom Clerk', icon: '📁', baseCost: 150, description: '+15 reward per correct mail', repeatable: true, effect() { state.rewardPerMail += 15; } },
+      { id: 'discount', name: 'Supplier Contract', icon: '📦', baseCost: 200, description: '5% cheaper future purchases', repeatable: true, effect() { state.costDiscount += 0.05; if (state.costDiscount > 0.5) state.costDiscount = 0.5; } },
+      { id: 'bonus', name: 'Motivation Poster', icon: '⭐', baseCost: 160, description: '+2 streak bonus reward', repeatable: true, effect() { state.streakBonus += 2; } },
+      { id: 'multiplier', name: 'Corporate Contract', icon: '💼', baseCost: 260, description: '+0.1x reward multiplier', repeatable: true, effect() { state.rewardMultiplier += 0.1; } }
+    ];
+
+    const pointsDisplay = document.getElementById('pointsDisplay');
+    const perReplyDisplay = document.getElementById('perReplyDisplay');
+    const autoMailDisplay = document.getElementById('autoMailDisplay');
+    const inboxCountDisplay = document.getElementById('inboxCountDisplay');
+    const streakDisplay = document.getElementById('streakDisplay');
+    const autoReplyDisplay = document.getElementById('autoReplyDisplay');
+    const statusText = document.getElementById('statusText');
+    const saveStateText = document.getElementById('saveStateText');
+    const mailList = document.getElementById('mailList');
+    const shopGrid = document.getElementById('shopGrid');
+    const ownedList = document.getElementById('ownedList');
+
+    const replyWindow = document.getElementById('replyWindow');
+    const replyTitle = document.getElementById('replyTitle');
+    const replyMeta = document.getElementById('replyMeta');
+    const originalMailBody = document.getElementById('originalMailBody');
+    const editorDisplay = document.getElementById('editorDisplay');
+    const replyTextarea = document.getElementById('replyTextarea');
+    const progressBox = document.getElementById('progressBox');
+    const mistakeBox = document.getElementById('mistakeBox');
+    const rewardPreview = document.getElementById('rewardPreview');
+
+    const popupWindow = document.getElementById('popupWindow');
+    const popupTitle = document.getElementById('popupTitle');
+    const popupMessage = document.getElementById('popupMessage');
+
+    const loadingWindow = document.getElementById('loadingWindow');
+    const loadingText = document.getElementById('loadingText');
+    const loadingSubtext = document.getElementById('loadingSubtext');
+    const loadingBar = document.getElementById('loadingBar');
+
+    function setStatus(text) {
+      statusText.textContent = text;
+    }
+
+    function setSaveState(text) {
+      saveStateText.textContent = text;
+    }
+
+    function showPopup(title, message) {
+      popupTitle.textContent = title;
+      popupMessage.textContent = message;
+      popupWindow.classList.remove('hidden');
+    }
+
+    function closePopup() {
+      popupWindow.classList.add('hidden');
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function getItemOwnedCount(id) {
+      return state.owned.filter(item => item.id === id).length;
+    }
+
+    function getDiscountedCost(baseCost, ownedCount) {
+      const scaled = Math.floor(baseCost * Math.pow(1.35, ownedCount));
+      const discounted = Math.floor(scaled * (1 - state.costDiscount));
+      return Math.max(1, discounted);
+    }
+
+    function calculateMailReward() {
+      const streakPart = state.streak * state.streakBonus;
+      const raw = (state.rewardPerMail + streakPart) * state.rewardMultiplier;
+      return Math.max(1, Math.floor(raw));
+    }
+
+    function createMail() {
+      const template = mailTemplates[Math.floor(Math.random() * mailTemplates.length)];
+      state.mails.unshift({
+        id: state.nextMailId++,
+        from: template.from,
+        subject: template.subject,
+        body: template.body,
+        hint: template.hint,
+        reward: calculateMailReward()
+      });
+    }
+
+    function openReply(mailId) {
+      const mail = state.mails.find(m => m.id === mailId);
+      if (!mail) return;
+
+      state.currentReplyMail = mail;
+      replyTitle.textContent = `Reply - ${mail.subject}`;
+      replyMeta.innerHTML = `
+        <div><strong>From:</strong> ${mail.from}</div>
+        <div><strong>Subject:</strong> ${mail.subject}</div>
+      `;
+      originalMailBody.textContent = mail.body;
+      replyTextarea.value = '';
+      mistakeBox.textContent = 'Type the exact example text to complete the letter.';
+      rewardPreview.textContent = `Correct letter reward: ${mail.reward} points`;
+      renderTypingLayer();
+      updateProgress();
+      replyWindow.classList.remove('hidden');
+      setStatus(`Opened reply editor for "${mail.subject}"`);
+      replyTextarea.focus();
+    }
+
+    function closeReplyWindow() {
+      replyWindow.classList.add('hidden');
+      state.currentReplyMail = null;
+      replyTextarea.value = '';
+      editorDisplay.innerHTML = '';
+      progressBox.textContent = '';
+      mistakeBox.textContent = 'Type the exact example text to complete the letter.';
+      rewardPreview.textContent = `Correct letter reward: ${calculateMailReward()} points`;
+      setStatus('Reply window closed');
+    }
+
+    function renderTypingLayer() {
+      const mail = state.currentReplyMail;
+      if (!mail) {
+        editorDisplay.innerHTML = '';
+        return;
+      }
+
+      const typedValue = replyTextarea.value;
+      const fullValue = mail.hint;
+      const typedPart = escapeHtml(fullValue.slice(0, typedValue.length));
+      const remainingPart = escapeHtml(fullValue.slice(typedValue.length));
+
+      editorDisplay.innerHTML = `<span class="typed">${typedPart}</span><span class="remaining">${remainingPart}</span>`;
+    }
+
+    function updateProgress() {
+      const mail = state.currentReplyMail;
+      if (!mail) {
+        progressBox.textContent = '';
+        return;
+      }
+      progressBox.textContent = ` (${replyTextarea.value.length}/${mail.hint.length})`;
+    }
+
+    function completeMail(mail, isAuto = false) {
+      state.points += mail.reward;
+      state.totalCompletedMails += 1;
+      state.streak += 1;
+      if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+      if (isAuto) state.totalAutoReplies += 1;
+      state.mails = state.mails.filter(m => m.id !== mail.id);
+
+      if (state.currentReplyMail && state.currentReplyMail.id === mail.id) {
+        closeReplyWindow();
+      }
+
+      setStatus(`${isAuto ? 'Auto reply sent' : 'Correct letter sent'}. Earned ${mail.reward} point(s)`);
+      autoSave();
+      renderAll();
+    }
+
+    function failCurrentLetter() {
+      state.streak = 0;
+      setStatus('Incorrect letter. No points awarded.');
+      mistakeBox.textContent = 'Incorrect letter. Type the exact text to earn points.';
+      autoSave();
+      renderAll();
+    }
+
+    function sendReply() {
+      const mail = state.currentReplyMail;
+      if (!mail) return;
+
+      if (replyTextarea.value !== mail.hint) {
+        failCurrentLetter();
+        return;
+      }
+
+      completeMail(mail, false);
+    }
+
+    function renderLoadingBlocks() {
+      const totalBlocks = 22;
+      loadingBar.innerHTML = '';
+      for (let i = 0; i < totalBlocks; i++) {
+        const block = document.createElement('div');
+        block.className = 'win-progress-block';
+        loadingBar.appendChild(block);
+      }
+    }
+
+    function runAutoReplyAnimation(mail, done) {
+      autoReplyBusy = true;
+      loadingText.textContent = `Auto-answering: ${mail.subject}`;
+      loadingSubtext.textContent = `Contact: ${mail.from}`;
+      renderLoadingBlocks();
+      loadingBar.style.width = '0%';
+      loadingWindow.classList.remove('hidden');
+
+      const duration = 900 + Math.floor(Math.random() * 500);
+      const start = performance.now();
+
+      function step(now) {
+        const progress = Math.min(1, (now - start) / duration);
+        loadingBar.style.width = `${progress * 100}%`;
+
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          setTimeout(() => {
+            loadingWindow.classList.add('hidden');
+            autoReplyBusy = false;
+            done();
+            processAutoReplyQueue();
+          }, 120);
+        }
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    function enqueueAutoReply(mailId) {
+      if (!state.mails.find(m => m.id === mailId)) return;
+      if (!autoReplyQueue.includes(mailId)) autoReplyQueue.push(mailId);
+      processAutoReplyQueue();
+    }
+
+    function processAutoReplyQueue() {
+      if (autoReplyBusy) return;
+      if (!autoReplyQueue.length) return;
+
+      const mailId = autoReplyQueue.shift();
+      const mail = state.mails.find(m => m.id === mailId);
+      if (!mail) {
+        processAutoReplyQueue();
+        return;
+      }
+
+      runAutoReplyAnimation(mail, () => {
+        completeMail(mail, true);
+      });
+    }
+
+    function autoReplyOne() {
+      if (!state.mails.length) {
+        setStatus('No e-mails available for auto reply');
+        return;
+      }
+      enqueueAutoReply(state.mails[state.mails.length - 1].id);
+    }
+
+    function buyItem(id) {
+      const item = shopItems.find(i => i.id === id);
+      if (!item) return;
+
+      const ownedCount = getItemOwnedCount(id);
+      const cost = getDiscountedCost(item.baseCost, ownedCount);
+
+      if (state.points < cost) {
+        showPopup('Not Enough Points', `You need ${cost} points for ${item.name}.`);
+        return;
+      }
+
+      state.points -= cost;
+      item.effect();
+      state.owned.push({
+        id: item.id,
+        name: item.name,
+        description: item.description
+      });
+
+      setStatus(`Purchased ${item.name}`);
+      autoSave();
+      renderAll();
+    }
+
+    function renderStats() {
+      pointsDisplay.textContent = state.points;
+      perReplyDisplay.textContent = calculateMailReward();
+      autoMailDisplay.textContent = state.autoMailRate;
+      inboxCountDisplay.textContent = state.mails.length;
+      streakDisplay.textContent = state.streak;
+      autoReplyDisplay.textContent = state.autoReplyRate;
+    }
+
+    function renderMail() {
+      if (!state.mails.length) {
+        mailList.innerHTML = `<div class="mail-card">No incoming e-mails. Please wait for new mail...</div>`;
+        return;
+      }
+
+      mailList.innerHTML = state.mails.map(mail => `
+        <div class="mail-card">
+          <div class="mail-subject">
+            <span>${mail.subject}</span>
+            <span class="mail-badge">+${mail.reward} pts</span>
+          </div>
+          <div class="mail-meta">From: ${mail.from}</div>
+          <div class="mail-body">${mail.body}</div>
+          <div class="mail-actions">
+            <button class="action-btn" onclick="openReply(${mail.id})" type="button">Open</button>
+            <button class="action-btn" onclick="queueMailAutoReply(${mail.id})" type="button">Auto Reply</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderShop() {
+      shopGrid.innerHTML = shopItems.map(item => {
+        const ownedCount = getItemOwnedCount(item.id);
+        const cost = getDiscountedCost(item.baseCost, ownedCount);
+
+        return `
+          <div class="shop-item">
+            <div class="shop-icon">${item.icon}</div>
+            <div class="shop-title">
+              <span>${item.name}</span>
+              <span>x${ownedCount}</span>
+            </div>
+            <div class="shop-desc">${item.description}</div>
+            <div class="shop-cost">Cost: ${cost} points</div>
+            <button class="buy-btn" onclick="buyItem('${item.id}')" type="button">Buy</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderOwned() {
+      if (!state.owned.length) {
+        ownedList.innerHTML = `<div class="owned-item">No bonuses owned yet.</div>`;
+        return;
+      }
+
+      const grouped = {};
+      state.owned.forEach(item => {
+        if (!grouped[item.id]) {
+          grouped[item.id] = {
+            name: item.name,
+            description: item.description,
+            count: 0
+          };
+        }
+        grouped[item.id].count += 1;
+      });
+
+      ownedList.innerHTML = Object.values(grouped).map(item => `
+        <div class="owned-item">
+          <div class="owned-item-title">${item.name} x${item.count}</div>
+          <div>${item.description}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderPanels() {
+      document.getElementById('mailPanel').classList.toggle('hidden', state.activePanel !== 'mail');
+      document.getElementById('shopPanel').classList.toggle('hidden', state.activePanel !== 'shop');
+      document.getElementById('upgradesPanel').classList.toggle('hidden', state.activePanel !== 'upgrades');
+      document.getElementById('helpPanel').classList.toggle('hidden', state.activePanel !== 'help');
+
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.panel === state.activePanel);
+      });
+    }
+
+    function renderAll() {
+      renderStats();
+      renderMail();
+      renderShop();
+      renderOwned();
+      renderPanels();
+    }
+
+    function saveGame() {
+      const toSave = {
+        ...state,
+        currentReplyMail: null
+      };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
+      setSaveState('Save: stored');
+    }
+
+    function autoSave() {
+      saveGame();
+    }
+
+    function loadGame() {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return false;
+
+      try {
+        const parsed = JSON.parse(raw);
+        state = {
+          ...structuredClone(defaultState),
+          ...parsed,
+          currentReplyMail: null
+        };
+        return true;
+      } catch (error) {
+        console.error('Save load error:', error);
+        return false;
+      }
+    }
+
+    function resetGame() {
+      localStorage.removeItem(SAVE_KEY);
+      state = structuredClone(defaultState);
+      autoReplyQueue = [];
+      autoReplyBusy = false;
+      loadingWindow.classList.add('hidden');
+      for (let i = 0; i < 3; i++) createMail();
+      closeReplyWindow();
+      renderAll();
+      setStatus('Save reset completed');
+      setSaveState('Save: reset');
+    }
+
+    replyTextarea.addEventListener('keydown', (e) => {
+      const mail = state.currentReplyMail;
+      if (!mail) return;
+
+      const allowedControlKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab', 'Home', 'End'];
+      if (allowedControlKeys.includes(e.key)) return;
+
+      if (e.ctrlKey || e.metaKey || e.altKey) {
+        e.preventDefault();
+        return;
+      }
+
+      if (e.key.length !== 1) return;
+
+      const current = replyTextarea.value;
+      const expectedChar = mail.hint[current.length];
+
+      if (e.key !== expectedChar) {
+        if (state.keyboardHelpLevel > 0) {
+          e.preventDefault();
+          replyTextarea.value += expectedChar;
+          renderTypingLayer();
+          updateProgress();
+          mistakeBox.textContent = `Auto-correct helped: expected "${expectedChar}"`;
+          return;
+        }
+
+        e.preventDefault();
+        mistakeBox.textContent = `Wrong key blocked. Expected "${expectedChar}"`;
+        setStatus('Wrong character blocked');
+      } else {
+        mistakeBox.textContent = 'Good. Keep typing the correct reply.';
+      }
+    });
+
+    replyTextarea.addEventListener('paste', (e) => {
+      e.preventDefault();
+      mistakeBox.textContent = 'Paste is disabled. Type the letter manually.';
+    });
+
+    replyTextarea.addEventListener('input', () => {
+      const mail = state.currentReplyMail;
+      if (!mail) return;
+
+      if (!mail.hint.startsWith(replyTextarea.value)) {
+        replyTextarea.value = mail.hint.slice(0, replyTextarea.value.length - 1);
+      }
+
+      renderTypingLayer();
+      updateProgress();
+
+      if (replyTextarea.value === mail.hint) {
+        mistakeBox.textContent = 'Letter complete. You can now send it.';
+      }
+    });
+
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        state.activePanel = item.dataset.panel;
+        setStatus(`Opened ${item.textContent}`);
+        renderPanels();
+      });
+    });
+
+    document.querySelectorAll('.menu-bar span').forEach(span => {
+      span.addEventListener('click', () => {
+        setStatus(`${span.textContent} menu is not implemented yet`);
+      });
+    });
+
+    document.getElementById('closeReplyBtn').addEventListener('click', closeReplyWindow);
+    document.getElementById('cancelReplyBtn').addEventListener('click', closeReplyWindow);
+    document.getElementById('sendReplyBtn').addEventListener('click', sendReply);
+    document.getElementById('popupCloseBtn').addEventListener('click', closePopup);
+    document.getElementById('popupOkBtn').addEventListener('click', closePopup);
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      saveGame();
+      setStatus('Game saved manually');
+    });
+    document.getElementById('resetBtn').addEventListener('click', resetGame);
+    document.getElementById('spawnMailBtn').addEventListener('click', () => {
+      createMail();
+      renderAll();
+      autoSave();
+      setStatus('Manual mail generated');
+    });
+    document.getElementById('autoReplyOneBtn').addEventListener('click', autoReplyOne);
+
+    if (!loadGame()) {
+      for (let i = 0; i < 3; i++) createMail();
+      setSaveState('Save: new game');
+    } else {
+      setStatus('Save loaded successfully');
+      setSaveState('Save: loaded');
+    }
+
+    setInterval(() => {
+      for (let i = 0; i < state.autoMailRate; i++) createMail();
+      renderAll();
+      autoSave();
+      setStatus('New e-mail(s) arrived');
+    }, 6000);
+
+    setInterval(() => {
+      if (!state.mails.length || state.autoReplyRate <= 0) return;
+      const repliesToQueue = Math.min(state.autoReplyRate, state.mails.length);
+      for (let i = 0; i < repliesToQueue; i++) {
+        const target = state.mails[state.mails.length - 1 - i];
+        if (target) enqueueAutoReply(target.id);
+      }
+    }, 12000);
+
+    setInterval(() => {
+      autoSave();
+    }, 15000);
+
+    renderAll();
+
+    window.openReply = openReply;
+    window.buyItem = buyItem;
+    window.queueMailAutoReply = enqueueAutoReply;
+  </script>
+</body>
+</html>
